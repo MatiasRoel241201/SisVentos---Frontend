@@ -1274,7 +1274,7 @@ function InventoryContent() {
                 {selectedProductsToLoad.map((item, index) => {
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const _product = allProducts.find(p => p.id === item.productId)
-                  const profitMargin = item.salePrice && item.cost ? (((item.salePrice - item.cost) / item.salePrice) * 100) : 0
+                  const profitMargin = item.salePrice && item.cost ? (((item.salePrice - item.cost) / item.cost) * 100) : 0
 
                   return (
                     <div key={index} className={cn(
