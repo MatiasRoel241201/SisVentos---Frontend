@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------
+   BRAND COLORS
+   (No tocar: usados en todo el sistema)
+--------------------------*/
+:root {
+  --color-brand-blue: #1E2C6D;
+  --color-brand-red: #D9251C;
+  --color-brand-black: #000000;
+  --color-brand-white: #FFFFFF;
+}
+
+/* -------------------------
+   BASE TYPOGRAPHY
+--------------------------*/
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* -------------------------
+   ORIGINAL DESIGN TOKENS
+   (Se mantienen sin cambios)
+--------------------------*/
+@layer base {
+  :root {
+    --background: 243 53% 2%;
+    --foreground: 243 18% 99%;
+    --muted: 213 36% 15%;
+    --muted-foreground: 213 2% 61%;
+    --popover: 243 53% 2%;
+    --popover-foreground: 243 18% 99%;
+    --card: 243 53% 2%;
+    --card-foreground: 243 18% 99%;
+    --border: 243 5% 15%;
+    --input: 243 5% 15%;
+    --primary: 243 40% 33%;
+    --primary-foreground: 243 40% 93%;
+    --secondary: 213 40% 33%;
+    --secondary-foreground: 213 40% 93%;
+    --accent: 273 40% 33%;
+    --accent-foreground: 273 40% 93%;
+    --destructive: 21 95% 59%;
+    --destructive-foreground: 0 0% 0%;
+    --ring: 243 40% 33%;
+    --chart-1: 243 40% 33%;
+    --chart-2: 213 40% 33%;
+    --chart-3: 273 40% 33%;
+    --chart-4: 213 40% 36%;
+    --chart-5: 243 43% 33%;
+    --radius: 0.5rem;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+/* -------------------------
+   TAILWIND APPLY BASE
+--------------------------*/
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
