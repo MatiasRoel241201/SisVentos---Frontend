@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { StatusPill } from "@/components/status-pill"
 import {
   Search,
@@ -295,9 +294,7 @@ function VentasContent() {
                   <TableRow className="border-b border-white/20 hover:bg-transparent">
                     <TableHead className="text-white/70">N° Orden</TableHead>
                     <TableHead className="text-white/70">Cliente</TableHead>
-                    <TableHead className="text-white/70">Productos</TableHead>
                     <TableHead className="text-white/70">Total</TableHead>
-                    <TableHead className="text-white/70">Método Pago</TableHead>
                     <TableHead className="text-white/70">Caja</TableHead>
                     <TableHead className="text-white/70">Estado</TableHead>
                     <TableHead className="text-white/70">Fecha</TableHead>
@@ -313,7 +310,6 @@ function VentasContent() {
                   ) : (
                     filteredOrders.map((order) => {
                       const customerDisplay = order.customerIdentifier || "Cliente"
-                      const paymentMethod = order.paymentMethod
                       return (
                         <TableRow key={`order-row-${order.id}`} className="border-b border-white/5 hover:bg-white/5">
                           <TableCell>
@@ -405,17 +401,7 @@ function VentasContent() {
                             </Dialog>
                           </TableCell>
                           <TableCell className="font-medium text-white">{customerDisplay}</TableCell>
-                          <TableCell>
-                            <span className="text-sm text-white/60">
-                              {order.items.reduce((sum, item) => sum + item.qty, 0)} items
-                            </span>
-                          </TableCell>
                           <TableCell className="font-bold text-blue-200">{formatCurrency(order.totalAmount)}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="border-[#1E2C6D]/30 bg-gradient-blue text-white">
-                              {getPaymentMethodLabel(paymentMethod)}
-                            </Badge>
-                          </TableCell>
                           <TableCell className="text-sm text-white/70">{order.createdBy?.userName || "N/A"}</TableCell>
                           <TableCell>
                             <StatusPill status={normalizeStatus(order.status.name)} />
@@ -438,28 +424,6 @@ function VentasContent() {
 
         {/* Breakdown por método de pago y caja */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="border-white/20 bg-white/5 backdrop-blur-md">
-            <CardHeader>
-              <CardTitle className="text-white">Ventas por Método de Pago</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {Object.entries(metrics.paymentMethodBreakdown).map(([method, amount]) => (
-                  <div
-                    key={`payment-${method}`}
-                    className="flex items-center justify-between rounded-lg bg-white/5 p-3 border border-white/10"
-                  >
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-[#1E2C6D]" />
-                      <span className="font-medium text-white">{getPaymentMethodLabel(method)}</span>
-                    </div>
-                    <span className="font-bold text-white">{formatCurrency(amount)}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
           <Card className="border-white/20 bg-white/5 backdrop-blur-md">
             <CardHeader>
               <CardTitle className="text-white">Ventas por Caja</CardTitle>
