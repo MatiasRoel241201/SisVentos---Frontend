@@ -14,4 +14,8 @@ export const ordersApi = {
     getOrder: async (eventId: string, orderId: string) => {
         return httpClient.get<Order>(`/events/${eventId}/orders/${orderId}`);
     },
+
+    cancelOrder: async (eventId: string, orderId: string) => {
+        return httpClient.patch<Order>(`/events/${eventId}/orders/${orderId}/cancel`, {});
+    },
 };

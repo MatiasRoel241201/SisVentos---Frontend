@@ -346,7 +346,7 @@ export default function UserManagement() {
             </Card>
 
             {/* Tabla de usuarios */}
-            <Card className="bg-white/5 border-white/20 backdrop-blur-xl overflow-hidden">
+            <Card className="bg-white/5 border-white/20 backdrop-blur-xl overflow-hidden mt-6">
                 <Table>
                     <TableHeader>
                         <TableRow className="border-white/10 hover:bg-white/5">

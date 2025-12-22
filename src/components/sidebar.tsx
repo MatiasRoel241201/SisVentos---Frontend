@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -31,13 +30,14 @@ import {
   SidebarGroupContent,
 } from "@/components/ui/sidebar"
 import { useAuth } from "../Context/AuthContext"
+import { useSidebarCollapse } from "../Context/SidebarContext"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function AppSidebar() {
   const { user, logout } = useAuth()
   const router = useRouter()
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const { isCollapsed, toggleCollapsed } = useSidebarCollapse()
 
   const handleLogout = () => {
     logout()
@@ -69,7 +69,7 @@ export function AppSidebar() {
     <TooltipProvider>
       {/* Botón de toggle fuera del Sidebar para evitar que sea cortado */}
       <Button
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={() => toggleCollapsed()}
         variant="outline"
         size="icon"
         className="h-6 w-6 rounded-full border-2 bg-sidebar hover:bg-blue-900 shadow-lg"

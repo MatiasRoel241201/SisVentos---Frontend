@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Calendar, Plus, Copy, Edit, Check, Search } from "lucide-react"
+import { Calendar, Plus, Edit, Check, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 
 import ProtectedRoute from "@/components/ProtectedRoute"
@@ -32,7 +31,8 @@ export default function EventosDashboard() {
 
 function EventosContent() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "upcoming" | "completed">("all")
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [statusFilter, _setStatusFilter] = useState<"all" | "active" | "upcoming" | "completed">("all")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
 
@@ -125,15 +125,6 @@ function EventosContent() {
       endDate: event.endDate ? new Date(event.endDate).toISOString().split('T')[0] : "",
     })
     setIsCreateDialogOpen(true)
-  }
-
-  const handleDuplicate = (eventId: string) => {
-    const eventToDuplicate = events.find(e => e.id === eventId)
-    if (eventToDuplicate) {
-      // Logic to pre-fill form with duplicated data could go here
-      // For now just console log or implement if backend supports duplicate endpoint
-      console.log("Duplicate feature pending backend support")
-    }
   }
 
   const getStatusColor = (event: Event) => {
@@ -262,17 +253,6 @@ function EventosContent() {
               className="pl-9 bg-white/5 border-white/20 text-white placeholder:text-white/40"
             />
           </div>
-          <Select value={statusFilter} onValueChange={(value: "all" | "active" | "upcoming" | "completed") => setStatusFilter(value)}>
-            <SelectTrigger className="w-full sm:w-48 bg-white/5 border-white/20 text-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="active">Activos</SelectItem>
-              <SelectItem value="upcoming">Próximos</SelectItem>
-              <SelectItem value="completed">Completados</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Events Grid */}
@@ -305,15 +285,6 @@ function EventosContent() {
                     >
                       <Edit className="h-3 w-3" />
                       Editar
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDuplicate(event.id)}
-                      className="flex-1 border-white/20 text-white hover:bg-white/10"
-                    >
-                      <Copy className="h-3 w-3" />
-                      Duplicar
                     </Button>
                   </div>
                 </div>

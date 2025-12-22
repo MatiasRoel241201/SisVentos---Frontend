@@ -31,7 +31,7 @@ export function StatusPill({ status }: StatusPillProps) {
   const statusConfig: Record<StatusType, { label: string; color: string }> = {
     pending: {
       label: "Pendiente",
-      color: "bg-red-950/30 text-red-400 border border-red-800",
+      color: "bg-blue-950/30 text-blue-400 border border-blue-800",
     },
     in_progress: {
       label: "En Preparación",
@@ -42,8 +42,8 @@ export function StatusPill({ status }: StatusPillProps) {
       color: "bg-green-950/30 text-green-400 border border-green-800",
     },
     delivered: {
-      label: "Entregado",
-      color: "bg-blue-950/30 text-blue-400 border border-blue-800",
+      label: "Cancelado",
+      color: "bg-red-950/30 text-red-400 border border-red-800",
     },
   }
 

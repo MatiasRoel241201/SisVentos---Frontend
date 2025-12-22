@@ -132,15 +132,20 @@ function InventoryContent() {
   const [deletingSupplyInventory, setDeletingSupplyInventory] = useState<EventSupplyInventory | null>(null)
 
 
-  // Set event from URL if provided
+  // Set event from URL if provided, otherwise select first event
   useEffect(() => {
-    if (eventIdFromUrl && events.length > 0) {
-      const eventExists = events.find(e => e.id === eventIdFromUrl)
-      if (eventExists) {
-        setSelectedEventId(eventIdFromUrl)
+    if (events.length > 0 && !selectedEventId) {
+      if (eventIdFromUrl) {
+        const eventExists = events.find(e => e.id === eventIdFromUrl)
+        if (eventExists) {
+          setSelectedEventId(eventIdFromUrl)
+          return
+        }
       }
+      // Fallback: select first event if no URL parameter
+      setSelectedEventId(events[0].id)
     }
-  }, [eventIdFromUrl, events])
+  }, [eventIdFromUrl, events, selectedEventId])
 
   // Reset pagination when changing tabs
   useEffect(() => {
@@ -411,8 +416,18 @@ function InventoryContent() {
       await inventoryMutations.loadSupplies.mutateAsync(data)
       setShowLoadSuppliesDialog(false)
       setSelectedSuppliesToLoad([])
+      toast({
+        title: "Insumos cargados",
+        description: "Los insumos se han cargado exitosamente al inventario.",
+      })
     } catch (error) {
       console.error('Error loading supplies:', error)
+      const errMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error al cargar los insumos."
+      toast({
+        variant: "destructive",
+        title: "Error al cargar insumos",
+        description: errMsg,
+      })
     }
   }
 

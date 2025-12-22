@@ -7,14 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { useActiveEvents } from "@/features/events/hooks/useEvents"
-import { useOrders } from "@/features/orders/hooks/useOrders"
+import { useOrders, useCancelOrder } from "@/features/orders/hooks/useOrders"
 import { useAuth } from "../../Context/AuthContext"
 import { OrderSheet } from "../Cashier/OrdeSheet"
-import { Eye, Plus, Search, Filter } from "lucide-react"
+import { Eye, Plus, Search, Filter, X } from "lucide-react"
 import { OrderDetailsModal } from "../Cashier/OrderDetails"
 import { StatusPill } from "../status-pill"
 import { Order } from "@/features/orders/types"
 import { formatEventDate } from "@/helpers/date"
+import { useToast } from "@/hooks/use-toast"
 
 export default function CajaDashboard() {
   const [selectedEventId, setSelectedEventId] = useState("")
@@ -22,8 +23,10 @@ export default function CajaDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [cancelingOrderId, setCancelingOrderId] = useState<string | null>(null)
 
   const { user } = useAuth()
+  const { toast } = useToast()
   const { data: events } = useActiveEvents()
 
   useEffect(() => {
@@ -34,12 +37,15 @@ export default function CajaDashboard() {
   }, [events, selectedEventId])
 
   const { data: orders, isLoading: isLoadingOrders } = useOrders(selectedEventId)
+  const cancelOrder = useCancelOrder(selectedEventId)
 
   const filteredOrders = useMemo(() => {
     if (!orders) return []
 
     return orders.filter((order) => {
-      const matchesSearch = order.customerIdentifier?.toLowerCase().includes(searchTerm.toLowerCase()) ?? true
+      const orderNumberStr = order.orderNumber.toString()
+      const matchesSearch = orderNumberStr.includes(searchTerm) ||
+        order.customerIdentifier?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = statusFilter === "all" || order.status.name === statusFilter
 
       return matchesSearch && matchesStatus
@@ -48,6 +54,30 @@ export default function CajaDashboard() {
 
   const handleOpenOrderDetails = (order: Order) => {
     setSelectedOrder(order)
+  }
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (cancelingOrderId) return // Evitar múltiples clics
+
+    setCancelingOrderId(orderId)
+    try {
+      await cancelOrder.mutateAsync(orderId)
+      toast({
+        title: "Orden cancelada",
+        description: "La orden fue cancelada y el stock fue restaurado.",
+      })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Error al cancelar la orden"
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+    } finally {
+      setCancelingOrderId(null)
+    }
   }
 
   const totalOrders = orders?.length || 0
@@ -207,15 +237,29 @@ export default function CajaDashboard() {
                               <StatusPill status={order.status.name} />
                             </TableCell>
                             <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleOpenOrderDetails(order)}
-                                className="border border-white text-white hover:bg-blue-900 hover:text-white hover:border-blue-900"
-                              >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Ver detalles
-                              </Button>
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleOpenOrderDetails(order)}
+                                  className="border border-white/50 text-white hover:bg-blue-900 hover:text-white hover:border-blue-900"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Ver detalles
+                                </Button>
+                                {order.status.name === "PENDING" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleCancelOrder(order.id)}
+                                    disabled={cancelingOrderId === order.id}
+                                    className="border border-red-500/70 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500"
+                                  >
+                                    <X className="h-4 w-4 mr-1" />
+                                    {cancelingOrderId === order.id ? "..." : "Cancelar"}
+                                  </Button>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}

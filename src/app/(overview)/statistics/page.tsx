@@ -53,7 +53,13 @@ export default function Statistics() {
 
   const topSellingData = statistics?.products.topSelling.slice(0, 5) || [];
 
-  console.log('topSellingData --> ', topSellingData)
+  // Datos ordenados por revenue para los gráficos de recaudación
+  const topRevenueData = [...(statistics?.products.topSelling || [])]
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+  const leastRevenueData = [...(statistics?.products.leastSelling || [])]
+    .sort((a, b) => a.revenue - b.revenue)
+    .slice(0, 5);
 
   const profitabilityData = statistics?.products.topProfitable.slice(0, 5).map(item => ({
     name: item.product,
@@ -138,7 +144,7 @@ export default function Statistics() {
                 <CardContent>
                   <div className="text-3xl font-bold text-foreground">${statistics.summary.netRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    -${statistics.summary.totalRefunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} en reembolsos
+                    - ${statistics.summary.totalRefunds.toLocaleString(undefined, { maximumFractionDigits: 0 })} en reembolsos
                   </p>
                 </CardContent>
               </Card>
@@ -207,7 +213,7 @@ export default function Statistics() {
                           ))}
                         </Pie>
                         <RechartsTooltip
-                          contentStyle={{ background: "rgba(0,0,0,0.8)", border: "1px solid #ffffff", borderRadius: "10px" }}
+                          contentStyle={{ background: "rgba(54, 4, 255, 0.8)", border: "1px solid #ffffff", borderRadius: "10px" }}
                           formatter={(value: number) => [`$${value.toLocaleString()}`, 'Monto']}
                         />
                         <Legend />
@@ -226,23 +232,66 @@ export default function Statistics() {
                 </CardContent>
               </Card>
 
-              {/* Top Selling Products */}
+              {/* Top 5 by Quantity Sold */}
               <Card className="border border-white-1 bg-card hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <CardTitle className="text-lg">Top 5 Productos Más Vendidos</CardTitle>
+                  <CardTitle className="text-lg">Top 5 Más Vendidos (Unidades)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={350}>
+                  <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={topSellingData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
                       <XAxis type="number" stroke="#ffffff" />
                       <YAxis dataKey="product" type="category" width={100} stroke="#ffffff" fontSize={12} />
                       <RechartsTooltip
                         contentStyle={{ background: "rgba(29, 44, 109, 0.9)", border: "1px solid #ffffff", borderRadius: "10px" }}
                         cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}
-                        formatter={(value: number, name: string) => [name === 'revenue' ? `$${value.toLocaleString()}` : value, name === 'revenue' ? 'Ingresos' : 'Cantidad']}
+                        formatter={(value: number) => [value, 'Unidades vendidas']}
                       />
-                      <Bar dataKey="qtySold" fill="#00C49F" name="Cantidad" radius={[0, 4, 4, 0]} barSize={20} />
-                      <Bar dataKey="revenue" fill="#8884d8" name="Ingresos" radius={[0, 4, 4, 0]} barSize={20} />
+                      <Bar dataKey="qtySold" fill="#00C49F" name="Cantidad" radius={[0, 4, 4, 0]} barSize={25} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Top 5 by Revenue */}
+              <Card className="border border-white-1 bg-card hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Top 5 Mayor Recaudación</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={topRevenueData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                      <XAxis type="number" stroke="#ffffff" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                      <YAxis dataKey="product" type="category" width={100} stroke="#ffffff" fontSize={12} />
+                      <RechartsTooltip
+                        contentStyle={{ background: "rgba(29, 44, 109, 0.9)", border: "1px solid #ffffff", borderRadius: "10px" }}
+                        cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}
+                        formatter={(value: number) => [`$${value.toLocaleString('es-AR')}`, 'Recaudación']}
+                      />
+                      <Bar dataKey="revenue" fill="#8884d8" name="Recaudación" radius={[0, 4, 4, 0]} barSize={25} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Bottom 5 by Revenue */}
+              <Card className="border border-white-1 bg-card hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Top 5 Menor Recaudación</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={leastRevenueData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                      <XAxis type="number" stroke="#ffffff" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                      <YAxis dataKey="product" type="category" width={100} stroke="#ffffff" fontSize={12} />
+                      <RechartsTooltip
+                        contentStyle={{ background: "rgba(220, 38, 38, 0.9)", border: "1px solid #ffffff", borderRadius: "10px" }}
+                        itemStyle={{ color: "#ffffff" }}
+                        labelStyle={{ color: "#ffffff" }}
+                        cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}
+                        formatter={(value: number) => [`$${value.toLocaleString('es-AR')}`, 'Recaudación']}
+                      />
+                      <Bar dataKey="revenue" fill="#ef4444" name="Recaudación" radius={[0, 4, 4, 0]} barSize={25} />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
