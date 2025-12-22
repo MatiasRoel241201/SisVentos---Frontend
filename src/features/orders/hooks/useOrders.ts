@@ -16,8 +16,9 @@ export const useCancelOrder = (eventId: string) => {
     return useMutation({
         mutationFn: (orderId: string) => ordersApi.cancelOrder(eventId, orderId),
         onSuccess: () => {
-            // Invalidar cache de órdenes para refrescar la lista
+            // Invalidar cache de órdenes e inventario para refrescar alertas de stock
             queryClient.invalidateQueries({ queryKey: ['orders', eventId] });
+            queryClient.invalidateQueries({ queryKey: ['inventory', 'products', eventId] });
         },
     });
 };

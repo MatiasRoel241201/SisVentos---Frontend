@@ -10,7 +10,9 @@ export const useCreateOrder = (eventId: string) => {
     return useMutation({
         mutationFn: (data: CreateOrderDto) => ordersApi.createOrder(eventId, data),
         onSuccess: () => {
+            // Invalidar cache de órdenes y inventario para refrescar alertas de stock
             queryClient.invalidateQueries({ queryKey: ['orders', eventId] });
+            queryClient.invalidateQueries({ queryKey: ['inventory', 'products', eventId] });
             toast({
                 title: 'Orden creada',
                 description: 'El pedido se ha registrado exitosamente.',

@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { useActiveEvents } from "@/features/events/hooks/useEvents"
 import { useOrders, useCancelOrder } from "@/features/orders/hooks/useOrders"
+import { useEventProducts } from "@/features/inventory/hooks/useInventory"
 import { useAuth } from "../../Context/AuthContext"
 import { OrderSheet } from "../Cashier/OrdeSheet"
-import { Eye, Plus, Search, Filter, X } from "lucide-react"
+import { Eye, Plus, Search, Filter, X, AlertTriangle } from "lucide-react"
 import { OrderDetailsModal } from "../Cashier/OrderDetails"
 import { StatusPill } from "../status-pill"
 import { Order } from "@/features/orders/types"
@@ -37,7 +38,15 @@ export default function CajaDashboard() {
   }, [events, selectedEventId])
 
   const { data: orders, isLoading: isLoadingOrders } = useOrders(selectedEventId)
+  const { data: products } = useEventProducts(selectedEventId)
   const cancelOrder = useCancelOrder(selectedEventId)
+
+  // Detectar productos con stock bajo usando minQty
+  const lowStockProducts = products?.filter((p) =>
+    Number(p.currentQty) > 0 &&
+    Number(p.currentQty) <= Number(p.minQty)
+  ) || []
+  const outOfStockProducts = products?.filter((p) => Number(p.currentQty) === 0) || []
 
   const filteredOrders = useMemo(() => {
     if (!orders) return []
@@ -156,6 +165,32 @@ export default function CajaDashboard() {
             </div>
           )}
         </div>
+
+        {/* Alerta de Stock Bajo */}
+        {selectedEventId && (lowStockProducts.length > 0 || outOfStockProducts.length > 0) && (
+          <Card className="border-l-4 border-l-orange-500 bg-orange-950/20 border-white/20">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-orange-400 mb-2">Alertas de Inventario</h3>
+                  {outOfStockProducts.length > 0 && (
+                    <p className="text-sm text-orange-300 mb-1">
+                      <span className="font-medium">Sin stock:</span>{" "}
+                      {outOfStockProducts.map((p) => p.product.name).join(", ")}
+                    </p>
+                  )}
+                  {lowStockProducts.length > 0 && (
+                    <p className="text-sm text-orange-300">
+                      <span className="font-medium">Stock bajo:</span>{" "}
+                      {lowStockProducts.map((p) => `${p.product.name} (${Math.floor(Number(p.currentQty))}/${Math.floor(Number(p.minQty))})`).join(", ")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {selectedEventId && (
           <>

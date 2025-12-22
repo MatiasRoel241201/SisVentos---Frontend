@@ -311,8 +311,12 @@ export default function CocinaDashboard() {
 
 
 
-  const lowStockProducts = products?.filter((p) => p.currentQty > 0 && p.currentQty <= 5) || []
-  const outOfStockProducts = products?.filter((p) => p.currentQty === 0) || []
+  // Usar minQty del inventario para determinar stock bajo
+  const lowStockProducts = products?.filter((p) =>
+    Number(p.currentQty) > 0 &&
+    Number(p.currentQty) <= Number(p.minQty)
+  ) || []
+  const outOfStockProducts = products?.filter((p) => Number(p.currentQty) === 0) || []
 
   return (
     <div className="min-h-screen bg-black p-6">
@@ -351,7 +355,7 @@ export default function CocinaDashboard() {
                   {lowStockProducts.length > 0 && (
                     <p className="text-sm text-orange-300">
                       <span className="font-medium">Stock bajo:</span>{" "}
-                      {lowStockProducts.map((p) => `${p.product.name} (${p.currentQty})`).join(", ")}
+                      {lowStockProducts.map((p) => `${p.product.name} (${Math.floor(Number(p.currentQty))})`).join(", ")}
                     </p>
                   )}
                 </div>
